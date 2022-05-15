@@ -5,11 +5,15 @@
   if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
     header('Location: login.php');
   }
-  $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC");
-  $stmt->execute();
-  $result = $stmt->fetchAll();
-  // print "<pre>";
-  // print_r($result);
+
+  if($_POST) {
+      $title = $_POST['title'];
+      $content = $_POST['content'];
+      $stmt = $pdo->prepare("INSERT INTO posts(title,content) VALUES (?,?)");
+      $stmt->execute([$title, $content]);
+      header('Location: index.php');
+  }
+
 ?>
 
 <!DOCTYPE html>
@@ -39,31 +43,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <ul class="navbar-nav">
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-      </li>
-    </ul>
-
-    <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
-      <!-- Navbar Search -->
-      <li class="nav-item">
-        <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-          <i class="fas fa-search"></i>
-        </a>
-        <div class="navbar-search-block">
-          <form class="form-inline">
-            <div class="input-group input-group-sm">
-              <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
-              <div class="input-group-append">
-                <button class="btn btn-navbar" type="submit">
-                  <i class="fas fa-search"></i>
-                </button>
-                <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
       </li>
     </ul>
   </nav>
@@ -107,10 +86,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-          <div class="col-sm-4">
-            <a href="add.php" class="btn btn-success">Add New Post</a>
-          </div>
-          <div class="col-sm-8">
+          <div class="col-sm-12">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="index.php">Home</a></li>
               <li class="breadcrumb-item active"><a href="logout.php">Logout</a></li>
@@ -121,61 +97,22 @@ scratch. This page gets rid of all links and provides the needed markup only.
     </section>
 
     <!-- Main content -->
-    <section class="content">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="card">
-              <div class="card-body">
-                <table class="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th style="width: 10px">#</th>
-                      <th>Title</th>
-                      <th>Content</th>
-                      <th style="width: 150px">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                      $i = 1;
-                      foreach ($result as $value) {
-                    ?>
-                        <tr>
-                          <td><?php echo($i) ?></td>
-                          <td><?php echo($value['title']) ?></td>
-                          <td><?php echo($value['content']) ?></td>
-                          <td>
-                            <a href="#" class="btn btn-primary">Edit</a>
-                            <a href="#" class="btn btn-danger">Delete</a>
-                          </td>
-                        </tr>
-                    <?php
-                      $i++;
-                      }
-                    ?>
-                  </tbody>
-                </table>
-              </div>
-              <!-- /.card-body -->
-              <div class="card-footer clearfix">
-                <ul class="pagination pagination-sm m-0 float-right">
-                  <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-                  <li class="page-item"><a class="page-link" href="#">1</a></li>
-                  <li class="page-item"><a class="page-link" href="#">2</a></li>
-                  <li class="page-item"><a class="page-link" href="#">3</a></li>
-                  <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
-                </ul>
-              </div>
-            </div>
-            <!-- /.card -->
-          </div>
-          <!-- /.col -->
+    <div class="container-fluid pl-3 pr-3">
+        <form action="add.php" method="POST">
+        <div class="form-group mb-4">
+            <label for="title" class="form-label" style="color: #666">Title</label>
+            <input type="text" name="title" class="form-control" required>
         </div>
-        <!-- /.row -->
-      </div><!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
+        <div class="form-group mb-4">
+            <label for="Content" class="form-label" style="color: #666">Content</label>
+            <textarea name="content" cols="30" rows="10" class="form-control" required></textarea>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-success mr-1">Add New Post</button>
+        </div>
+        </form>
+    </div>
+    
   </div>
   <!-- /.content-wrapper -->
 

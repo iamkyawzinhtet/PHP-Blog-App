@@ -1,7 +1,7 @@
 <?php
     define('MYSQL_USER', 'root');
     define('MYSQL_PASSWORD', '');
-    define('MYSQL_DATABASE', 'blog');
+    define('MYSQL_DATABASE', 'blog_app');
     define('MYSQL_HOST', 'localhost');
 
     $pdoStatement = [
