@@ -5,9 +5,36 @@
   if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
     header('Location: login.php');
   }
-  $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC");
-  $stmt->execute();
-  $result = $stmt->fetchAll();
+
+  if(!empty($_GET['pageno'])) {
+    $pageno = $_GET['pageno'];
+  }else {
+    $pageno = 1;
+  }
+  $numOfRecs = 5;
+  $offset = ($pageno - 1) * $numOfRecs;
+
+  if(empty($_POST['search'])) {
+    $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC");
+    $stmt->execute();
+    $rawResult = $stmt->fetchAll();
+    $total_pages = ceil(count($rawResult) / $numOfRecs);
+
+    $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC LIMIT $offset,$numOfRecs");
+    $stmt->execute();
+    $result = $stmt->fetchAll();
+  }else {
+    $searchKey = $_POST['search'];
+    $stmt = $pdo->prepare("SELECT * FROM posts WHERE title LIKE '%$searchKey%' ORDER BY id DESC");
+    $stmt->execute();
+    $rawResult = $stmt->fetchAll();
+    $total_pages = ceil(count($rawResult) / $numOfRecs);
+
+    $stmt = $pdo->prepare("SELECT * FROM posts WHERE title LIKE '%$searchKey%' ORDER BY id DESC LIMIT $offset,$numOfRecs");
+    $stmt->execute();
+    $result = $stmt->fetchAll();
+  }
+
   // print "<pre>";
   // print_r($result);
 ?>
@@ -50,9 +77,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <i class="fas fa-search"></i>
         </a>
         <div class="navbar-search-block">
-          <form class="form-inline">
+          <form class="form-inline" method="POST" action="index.php">
             <div class="input-group input-group-sm">
-              <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+              <input name="search" class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
               <div class="input-group-append">
                 <button class="btn btn-navbar" type="submit">
                   <i class="fas fa-search"></i>
@@ -158,13 +185,24 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </table>
               </div>
               <!-- /.card-body -->
+
               <div class="card-footer clearfix">
                 <ul class="pagination pagination-sm m-0 float-right">
-                  <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-                  <li class="page-item"><a class="page-link" href="#">1</a></li>
-                  <li class="page-item"><a class="page-link" href="#">2</a></li>
-                  <li class="page-item"><a class="page-link" href="#">3</a></li>
-                  <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+                  <li class="page-item">
+                    <a class="page-link" href="?pageno=1">First</a>
+                  </li>
+                  <li class="page-item <?php if($pageno<=1){echo 'disabled';} ?>">
+                    <a class="page-link" href="<?php if($pageno<=1){echo '#';}else{echo "?pageno=".($pageno-1);} ?>">Previous</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#"><?php echo $pageno; ?></a>
+                  </li>
+                  <li class="page-item <?php if($pageno>=$total_pages){echo 'disabled';} ?>">
+                    <a class="page-link" href="<?php if($pageno>=$total_pages){echo '#';}else{echo "?pageno=".($pageno+1);} ?>">Next</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="?pageno=<?php echo $total_pages ?>">Last</a>
+                  </li>
                 </ul>
               </div>
             </div>
