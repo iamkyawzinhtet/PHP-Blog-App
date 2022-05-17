@@ -7,11 +7,24 @@
   }
 
   if($_POST) {
-      $title = $_POST['title'];
-      $content = $_POST['content'];
-      $stmt = $pdo->prepare("INSERT INTO posts(title,content) VALUES (?,?)");
-      $stmt->execute([$title, $content]);
-      header('Location: index.php');
+      $file = 'images/'.($_FILES['image']['name']);
+      $imageType = pathinfo($file, PATHINFO_EXTENSION);
+      // print_r($imageType);
+      if($imageType != 'jpg' && $imageType != 'png' && $imageType != 'jpeg'){
+        echo "<script>alert('Image must be png,jpg or jpeg.');</script>";
+      }else {
+        $title = $_POST['title'];
+        $content = $_POST['content'];
+        $image = $_FILES['image']['name'];
+        move_uploaded_file($_FILES['image']['tmp_name'], $file);
+
+        $stmt = $pdo->prepare("INSERT INTO posts(title,content,image) VALUES (?,?,?)");
+        $result = $stmt->execute([$title, $content,$image]);
+        if($result) {
+            echo "<script>alert('Successfully added.');
+            window.location.href='index.php';</script>";
+        }
+      }
   }
 
 ?>
@@ -98,7 +111,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     <!-- Main content -->
     <div class="container-fluid pl-3 pr-3">
-        <form action="add.php" method="POST">
+        <form action="add.php" method="POST" enctype='multipart/form-data'>
         <div class="form-group mb-4">
             <label for="title" class="form-label" style="color: #666">Title</label>
             <input type="text" name="title" class="form-control" required>
@@ -106,6 +119,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <div class="form-group mb-4">
             <label for="Content" class="form-label" style="color: #666">Content</label>
             <textarea name="content" cols="30" rows="10" class="form-control" required></textarea>
+        </div>
+        <div class="form-group mb-4">
+            <label for="image" class="form-label" style="color: #666">Image</label>
+            <input type="file" name="image" class="form-control" required>
         </div>
         <div class="form-group">
             <button type="submit" class="btn btn-success mr-1">Add New Post</button>

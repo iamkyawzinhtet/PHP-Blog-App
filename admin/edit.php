@@ -5,20 +5,45 @@
   if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
     header('Location: login.php');
   }
-
-    $stmt = $pdo->prepare("SELECT * FROM posts WHERE id=".$_GET['id']);
-    $stmt->execute();
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
     // print "<pre>";
     // print_r($result);
 
     if($_POST) {
-        $title = $_POST['title'];
-        $content = $_POST['content'];
-        $stmt = $pdo->prepare("UPDATE posts SET title='$title',content='$content' WHERE id=".$_GET['id']);
-        $stmt->execute();
-        echo "<script>alert('Successfully Updated');window.location.href='index.php';</script>";
-    }
+      $id = $_POST['id'];
+      $title = $_POST['title'];
+      $content = $_POST['content'];
+
+      if($_FILES['image']['name'] != null) {
+        
+        $file = 'images/'.($_FILES['image']['name']);
+        $imageType = pathinfo($file,PATHINFO_EXTENSION);
+  
+        if($imageType != 'png' && $imageType != 'jpg' && $imageType != 'jpeg') {
+          echo "<script>alert('Image must be png,jpg or jpeg.');</script>";
+        }else {
+            $image = $_FILES['image']['name'];
+            move_uploaded_file($_FILES['image']['tmp_name'],$file);
+  
+            $stmt = $pdo->prepare("UPDATE posts SET title='$title',content='$content',image='$image' WHERE id='$id'");
+            $result = $stmt->execute();
+              if($result) {
+                  echo "<script>alert('Successfully updated.');
+                  window.location.href='index.php';</script>";
+              }
+        }
+      }else {
+        $stmt = $pdo->prepare("UPDATE posts SET title='$title',content='$content' WHERE id='$id'");
+        $result = $stmt->execute();
+          if($result) {
+              echo "<script>alert('Successfully updated.');
+              window.location.href='index.php';</script>";
+          }
+      }
+  }
+
+  $stmt = $pdo->prepare("SELECT * FROM posts WHERE id=".$_GET['id']);
+  $stmt->execute();
+  $result = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -103,14 +128,20 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     <!-- Main content -->
     <div class="container-fluid pl-3 pr-3">
-        <form action="" method="POST">
+        <form action="" method="POST" enctype='multipart/form-data'>
         <div class="form-group mb-4">
+            <input type="hidden" name="id" value="<?php echo $result[0]['id']?>" >
             <label for="title" class="form-label" style="color: #666">Title</label>
-            <input type="text" name="title" class="form-control" value="<?php echo($result['title']) ?>" required>
+            <input type="text" name="title" class="form-control" value="<?php echo($result[0]['title']) ?>" required>
         </div>
         <div class="form-group mb-4">
             <label for="Content" class="form-label" style="color: #666">Content</label>
-            <textarea name="content" cols="30" rows="10" class="form-control" required><?php echo($result['content']) ?></textarea>
+            <textarea name="content" cols="30" rows="10" class="form-control" required><?php echo($result[0]['content']) ?></textarea>
+        </div>
+        <div class="form-group mb-4">
+            <label for="image" class="form-label mb-3" style="color: #666">Image</label>
+            <img src="images/<?php echo $result[0]['image']?>" width="150" class="mb-3"><br>
+            <input type="file" name="image" class="form-control">
         </div>
         <div class="form-group">
             <button type="submit" class="btn btn-success mr-1">Update Post</button>

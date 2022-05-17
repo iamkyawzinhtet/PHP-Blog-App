@@ -1,13 +1,14 @@
 <?php
-//   session_start();
-//   require 'config/config.php';
+  session_start();
+  require 'config/config.php';
 
-//   if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
-//     header('Location: login.php');
-//   }
+  if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
+    header('Location: login.php');
+  }
 
-  // print "<pre>";
-  // print_r($result);
+  $stmt = $pdo->prepare("SELECT * FROM posts WHERE id=".$_GET['id']);
+  $stmt->execute();
+  $result = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -33,7 +34,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <!-- Container. Contains page content -->
   <div class="container">
   <!-- Content Header (Page header) -->
-  <section class="content-header mb-4">
+  <section class="content-header mb-3">
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-4">
@@ -57,9 +58,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <div class="card card-widget">
               <!-- /.card-header -->
               <div class="card-body">
-                <img class="img-fluid pad mb-3" src="dist/img/photo2.png" alt="Photo">
-                <h4>Sample Title</h4>
-                <p>I took this photo this morning. What do you guys think?</p>
+                <img class="img-fluid pad mb-3" src="admin/images/<?php echo $result[0]['image']?>" alt="Photo">
+                <h4><?php echo $result[0]['title']?></h4>
+                <p><?php echo $result[0]['content']?></p>
                 <hr>
                 
               </div>

@@ -1,3 +1,35 @@
+<?php
+    session_start();
+    require 'config/config.php';
+    if($_POST) {
+      $name = $_POST['name'];
+      $email = $_POST['email'];
+      $password = $_POST['password'];
+
+      $stmt = $pdo->prepare("SELECT * FROM users WHERE email=:email");
+      $stmt->bindValue(':email', $email);
+      $stmt->execute();
+      $user = $stmt->fetch(PDO::FETCH_ASSOC);
+      if($user) {
+        echo "<script>alert('This account already exists.')</script>";
+      }else {
+        $stmt = $pdo->prepare("INSERT INTO users(name,email,password) VALUES (:name,:email,:password)");
+        $result = $stmt->execute(
+          array(
+            ':name' => $name,
+            ':email' => $email,
+            ':password' => $password,
+          )
+        );
+        if($result) {
+          echo "<script>alert('Successfully registered');
+          window.location.href='login.php';</script>";
+        }
+      }
+
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,9 +56,9 @@
     <div class="card-body login-card-body">
       <p class="login-box-msg mb-3">Register</p>
 
-      <form action="../../index3.html" method="post">
+      <form action="register.php" method="post">
         <div class="input-group mb-4">
-          <input type="text" class="form-control" placeholder="Name" required>
+          <input name="name" type="text" class="form-control" placeholder="Name" required>
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-user"></span>
@@ -34,7 +66,7 @@
           </div>
         </div>
         <div class="input-group mb-4">
-          <input type="email" class="form-control" placeholder="Email" required>
+          <input name="email" type="email" class="form-control" placeholder="Email" required>
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-envelope"></span>
@@ -42,7 +74,7 @@
           </div>
         </div>
         <div class="input-group mb-4">
-          <input type="password" class="form-control" placeholder="Password" required>
+          <input name="password" type="password" class="form-control" placeholder="Password" required>
           <div class="input-group-append">
             <div class="input-group-text">
               <span class="fas fa-lock"></span>

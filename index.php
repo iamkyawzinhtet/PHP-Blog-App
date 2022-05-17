@@ -1,10 +1,14 @@
 <?php
-//   session_start();
-//   require 'config/config.php';
+  session_start();
+  require 'config/config.php';
 
-//   if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
-//     header('Location: login.php');
-//   }
+  if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
+    header('Location: login.php');
+  }
+
+  $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC");
+  $stmt->execute();
+  $result = $stmt->fetchAll();
 
   // print "<pre>";
   // print_r($result);
@@ -51,22 +55,32 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <!-- Main content -->
   <section class="content">
       <div class="container-fluid">
-      <div class="row">
-          <div class="col-md-4">
-            <!-- Box Comment -->
-            <div class="card card-widget">
-              <!-- /.card-header -->
-              <div class="card-body">
-                <a href="blogdetail.php" style="color: #666">
-                    <img class="img-fluid pad mb-3" src="dist/img/photo2.png" alt="Photo">
-                    <h5 style="text-align:center">Sample Title</h5>
-                </a>
+        <div class="row">
+        <?php
+        if($result){
+          $i = 1;
+          foreach ($result as $value) {
+          ?>
+            <div class="col-md-4">
+              <!-- Box Comment -->
+              <div class="card">
+                <!-- /.card-header -->
+                <div class="card-body">
+                  <a href="blogdetail.php?id=<?php echo $value['id']?>" style="color: #666">
+                    <img class="img-fluid pad mb-3" src="admin/images/<?php echo $value['image']?>" style="height: 200px;">
+                    <h5 style="text-align:center"><?php echo($value['title']) ?></h5>
+                  </a>
+                </div>
+                <!-- /.card-body -->
               </div>
-              <!-- /.card-body -->
+              <!-- /.card -->
             </div>
-            <!-- /.card -->
-          </div>
-          <!-- /.col -->
+            <!-- /.col -->
+        <?php
+        $i++;
+        }
+      }
+        ?>
         </div>
         <!-- /.row -->
       </div>

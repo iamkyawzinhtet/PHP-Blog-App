@@ -9,7 +9,7 @@
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if($user){
+        if($user['role'] == 1){
             if($user['password'] == $password) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['logged_in'] = time();
@@ -66,7 +66,6 @@
         </div>
         <div class="button-group">
         <button type="submit" class="btn btn-primary mr-1">Sign In</button>
-        <a href="register.php">Register</a>
         </div>
       </form>
     </div>
