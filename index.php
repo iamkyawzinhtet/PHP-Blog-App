@@ -5,10 +5,34 @@
   if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
     header('Location: login.php');
   }
+  if(!empty($_GET['pageno'])) {
+    $pageno = $_GET['pageno'];
+  }else {
+    $pageno = 1;
+  }
+  $numOfRecs = 6;
+  $offset = ($pageno - 1) * $numOfRecs;
 
-  $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC");
-  $stmt->execute();
-  $result = $stmt->fetchAll();
+  if(empty($_POST['search'])) {
+    $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC");
+    $stmt->execute();
+    $rawResult = $stmt->fetchAll();
+    $total_pages = ceil(count($rawResult) / $numOfRecs);
+
+    $stmt = $pdo->prepare("SELECT * FROM posts ORDER BY id DESC LIMIT $offset,$numOfRecs");
+    $stmt->execute();
+    $result = $stmt->fetchAll();
+  }else {
+    $searchKey = $_POST['search'];
+    $stmt = $pdo->prepare("SELECT * FROM posts WHERE title LIKE '%$searchKey%' ORDER BY id DESC");
+    $stmt->execute();
+    $rawResult = $stmt->fetchAll();
+    $total_pages = ceil(count($rawResult) / $numOfRecs);
+
+    $stmt = $pdo->prepare("SELECT * FROM posts WHERE title LIKE '%$searchKey%' ORDER BY id DESC LIMIT $offset,$numOfRecs");
+    $stmt->execute();
+    $result = $stmt->fetchAll();
+  }
 
   // print "<pre>";
   // print_r($result);
@@ -83,6 +107,25 @@ scratch. This page gets rid of all links and provides the needed markup only.
         ?>
         </div>
         <!-- /.row -->
+        <div class="row float-right">
+          <ul class="pagination pagination-sm m-0 float-right">
+            <li class="page-item">
+              <a class="page-link" href="?pageno=1">First</a>
+            </li>
+            <li class="page-item <?php if($pageno<=1){echo 'disabled';} ?>">
+              <a class="page-link" href="<?php if($pageno<=1){echo '#';}else{echo "?pageno=".($pageno-1);} ?>">Previous</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="#"><?php echo $pageno; ?></a>
+            </li>
+            <li class="page-item <?php if($pageno>=$total_pages){echo 'disabled';} ?>">
+              <a class="page-link" href="<?php if($pageno>=$total_pages){echo '#';}else{echo "?pageno=".($pageno+1);} ?>">Next</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?pageno=<?php echo $total_pages ?>">Last</a>
+            </li>
+          </ul>
+        </div>
       </div>
   </section>
   </div>
@@ -90,7 +133,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 
   <!-- Main Footer -->
-  <footer class="main-footer" style="margin-left: 0;text-align: center;">
+  <footer class="main-footer mt-4" style="margin-left: 0;text-align: center;">
     <!-- Default to the left -->
     <strong>Copyright &copy; 2022 <a href="#">Blog App</a>.</strong> All rights reserved.
   </footer>
