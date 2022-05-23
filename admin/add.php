@@ -7,22 +7,31 @@
   }
 
   if($_POST) {
-      $file = 'images/'.($_FILES['image']['name']);
-      $imageType = pathinfo($file, PATHINFO_EXTENSION);
-      // print_r($imageType);
-      if($imageType != 'jpg' && $imageType != 'png' && $imageType != 'jpeg'){
-        echo "<script>alert('Image must be png,jpg or jpeg.');</script>";
+      if(empty($_POST['title']) || empty($_POST['content'])) {
+        if(empty($_POST['title'])) {
+          $titleError = 'Title is required';
+        }
+        if(empty($_POST['content'])) {
+          $contentError = 'Content is required';
+        }
       }else {
-        $title = $_POST['title'];
-        $content = $_POST['content'];
-        $image = $_FILES['image']['name'];
-        move_uploaded_file($_FILES['image']['tmp_name'], $file);
+        $file = 'images/'.($_FILES['image']['name']);
+        $imageType = pathinfo($file, PATHINFO_EXTENSION);
+        // print_r($imageType);
+        if($imageType != 'jpg' && $imageType != 'png' && $imageType != 'jpeg'){
+          echo "<script>alert('Image must be png,jpg or jpeg.');</script>";
+        }else {
+          $title = $_POST['title'];
+          $content = $_POST['content'];
+          $image = $_FILES['image']['name'];
+          move_uploaded_file($_FILES['image']['tmp_name'], $file);
 
-        $stmt = $pdo->prepare("INSERT INTO posts(title,content,image) VALUES (?,?,?)");
-        $result = $stmt->execute([$title, $content,$image]);
-        if($result) {
-            echo "<script>alert('Successfully added.');
-            window.location.href='index.php';</script>";
+          $stmt = $pdo->prepare("INSERT INTO posts(title,content,image) VALUES (?,?,?)");
+          $result = $stmt->execute([$title, $content,$image]);
+          if($result) {
+              echo "<script>alert('Successfully added.');
+              window.location.href='index.php';</script>";
+          }
         }
       }
   }
@@ -114,15 +123,17 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <form action="add.php" method="POST" enctype='multipart/form-data'>
         <div class="form-group mb-4">
             <label for="title" class="form-label" style="color: #666">Title</label>
-            <input type="text" name="title" class="form-control" required>
+            <p style="color: red"><?php echo empty($titleError) ? '' : '*'.$titleError; ?></p>
+            <input type="text" name="title" class="form-control">
         </div>
         <div class="form-group mb-4">
             <label for="Content" class="form-label" style="color: #666">Content</label>
-            <textarea name="content" cols="30" rows="10" class="form-control" required></textarea>
+            <p style="color: red"><?php echo empty($contentError) ? '' : '*'.$contentError; ?></p>
+            <textarea name="content" cols="30" rows="10" class="form-control"></textarea>
         </div>
         <div class="form-group mb-4">
             <label for="image" class="form-label" style="color: #666">Image</label>
-            <input type="file" name="image" class="form-control" required>
+            <input type="file" name="image" class="form-control">
         </div>
         <div class="form-group">
             <button type="submit" class="btn btn-success mr-1">Add New Post</button>

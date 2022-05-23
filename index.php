@@ -108,7 +108,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         </div>
         <!-- /.row -->
         <div class="row float-right">
-          <ul class="pagination pagination-sm m-0 float-right">
+          <ul class="pagination pagination-sm m-0">
             <li class="page-item">
               <a class="page-link" href="?pageno=1">First</a>
             </li>

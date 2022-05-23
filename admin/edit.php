@@ -9,35 +9,44 @@
     // print_r($result);
 
     if($_POST) {
-      $id = $_POST['id'];
-      $title = $_POST['title'];
-      $content = $_POST['content'];
-
-      if($_FILES['image']['name'] != null) {
-        
-        $file = 'images/'.($_FILES['image']['name']);
-        $imageType = pathinfo($file,PATHINFO_EXTENSION);
-  
-        if($imageType != 'png' && $imageType != 'jpg' && $imageType != 'jpeg') {
-          echo "<script>alert('Image must be png,jpg or jpeg.');</script>";
-        }else {
-            $image = $_FILES['image']['name'];
-            move_uploaded_file($_FILES['image']['tmp_name'],$file);
-  
-            $stmt = $pdo->prepare("UPDATE posts SET title='$title',content='$content',image='$image' WHERE id='$id'");
-            $result = $stmt->execute();
-              if($result) {
-                  echo "<script>alert('Successfully updated.');
-                  window.location.href='index.php';</script>";
-              }
+      if(empty($_POST['title']) || empty($_POST['content'])) {
+        if(empty($_POST['title'])) {
+          $titleError = 'Title is required';
+        }
+        if(empty($_POST['content'])) {
+          $contentError = 'Content is required';
         }
       }else {
-        $stmt = $pdo->prepare("UPDATE posts SET title='$title',content='$content' WHERE id='$id'");
-        $result = $stmt->execute();
-          if($result) {
-              echo "<script>alert('Successfully updated.');
-              window.location.href='index.php';</script>";
+        $id = $_POST['id'];
+        $title = $_POST['title'];
+        $content = $_POST['content'];
+  
+        if($_FILES['image']['name'] != null) {
+          
+          $file = 'images/'.($_FILES['image']['name']);
+          $imageType = pathinfo($file,PATHINFO_EXTENSION);
+    
+          if($imageType != 'png' && $imageType != 'jpg' && $imageType != 'jpeg') {
+            echo "<script>alert('Image must be png,jpg or jpeg.');</script>";
+          }else {
+              $image = $_FILES['image']['name'];
+              move_uploaded_file($_FILES['image']['tmp_name'],$file);
+    
+              $stmt = $pdo->prepare("UPDATE posts SET title='$title',content='$content',image='$image' WHERE id='$id'");
+              $result = $stmt->execute();
+                if($result) {
+                    echo "<script>alert('Successfully updated.');
+                    window.location.href='index.php';</script>";
+                }
           }
+        }else {
+          $stmt = $pdo->prepare("UPDATE posts SET title='$title',content='$content' WHERE id='$id'");
+          $result = $stmt->execute();
+            if($result) {
+                echo "<script>alert('Successfully updated.');
+                window.location.href='index.php';</script>";
+            }
+        }
       }
   }
 
@@ -132,11 +141,13 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <div class="form-group mb-4">
             <input type="hidden" name="id" value="<?php echo $result[0]['id']?>" >
             <label for="title" class="form-label" style="color: #666">Title</label>
-            <input type="text" name="title" class="form-control" value="<?php echo($result[0]['title']) ?>" required>
+            <p style="color: red"><?php echo empty($titleError) ? '' : '*'.$titleError; ?></p>
+            <input type="text" name="title" class="form-control" value="<?php echo($result[0]['title']) ?>">
         </div>
         <div class="form-group mb-4">
             <label for="Content" class="form-label" style="color: #666">Content</label>
-            <textarea name="content" cols="30" rows="10" class="form-control" required><?php echo($result[0]['content']) ?></textarea>
+            <p style="color: red"><?php echo empty($contentError) ? '' : '*'.$contentError; ?></p>
+            <textarea name="content" cols="30" rows="10" class="form-control"><?php echo($result[0]['content']) ?></textarea>
         </div>
         <div class="form-group mb-4">
             <label for="image" class="form-label mb-3" style="color: #666">Image</label>
