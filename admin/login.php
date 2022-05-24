@@ -9,7 +9,7 @@
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if($user['role'] == 1){
+        if($user){
             if($user['password'] == $password) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['logged_in'] = time();
