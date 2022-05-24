@@ -1,6 +1,7 @@
 <?php
   session_start();
   require 'config/config.php';
+  require 'config/common.php';
 
   if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
     header('Location: login.php');
@@ -47,7 +48,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Blog App | Admin</title>
+  <title>Blog App</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -92,7 +93,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <div class="card-body">
                   <a href="blogdetail.php?id=<?php echo $value['id']?>" style="color: #666">
                     <img class="img-fluid pad mb-3" src="admin/images/<?php echo $value['image']?>" style="height: 200px;">
-                    <h5 style="text-align:center"><?php echo($value['title']) ?></h5>
+                    <h5 style="text-align:center"><?php echo escape($value['title']) ?></h5>
                   </a>
                 </div>
                 <!-- /.card-body -->

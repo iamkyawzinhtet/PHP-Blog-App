@@ -144,12 +144,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <input type="hidden" name="id" value="<?php echo $result[0]['id']?>" >
             <label for="title" class="form-label" style="color: #666">Title</label>
             <p style="color: red"><?php echo empty($titleError) ? '' : '*'.$titleError; ?></p>
-            <input type="text" name="title" class="form-control" value="<?php echo($result[0]['title']) ?>">
+            <input type="text" name="title" class="form-control" value="<?php echo escape($result[0]['title']) ?>">
         </div>
         <div class="form-group mb-4">
             <label for="Content" class="form-label" style="color: #666">Content</label>
             <p style="color: red"><?php echo empty($contentError) ? '' : '*'.$contentError; ?></p>
-            <textarea name="content" cols="30" rows="10" class="form-control"><?php echo($result[0]['content']) ?></textarea>
+            <textarea name="content" cols="30" rows="10" class="form-control"><?php echo escape($result[0]['content']) ?></textarea>
         </div>
         <div class="form-group mb-4">
             <label for="image" class="form-label mb-3" style="color: #666">Image</label>
