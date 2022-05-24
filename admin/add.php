@@ -1,6 +1,7 @@
 <?php
   session_start();
   require '../config/config.php';
+  require '../config/common.php';
 
   if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
     header('Location: login.php');
@@ -121,6 +122,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Main content -->
     <div class="container-fluid pl-3 pr-3">
         <form action="add.php" method="POST" enctype='multipart/form-data'>
+        <input name="_token" type="hidden" value="<?php echo $_SESSION['_token']; ?>">
         <div class="form-group mb-4">
             <label for="title" class="form-label" style="color: #666">Title</label>
             <p style="color: red"><?php echo empty($titleError) ? '' : '*'.$titleError; ?></p>
